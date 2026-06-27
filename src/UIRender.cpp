@@ -15,6 +15,8 @@ void UIRender::printMainMenu()
               << "1. Play a Music" << std::endl
               << "2. Search" << std::endl
               << "3. Set Playback Mode" << std::endl
+              << "4. Add a Song to Favorites" << std::endl
+              << "5. Temporary Sort" << std::endl
               << "0. EXIT" << std::endl
               << RESET;
 }
@@ -39,6 +41,7 @@ void UIRender::printSongs(std::vector<Song*> songs)
 
     for(int i = 0; i < songs.size(); i++)
     {
+        std::cout << BLUE << i << ". " << std::endl << RESET;
         printSong(songs[i]);
         if(i < songs.size() - 1)
         {
@@ -66,17 +69,20 @@ void UIRender::printPlayingSongOptions()
               << RESET;
 }
 
-void UIRender::printPlaylists(std::vector<Playlist*> playlists)
+void UIRender::printPlaylists(std::vector<Playlist*> playlists, std::vector<Song*> favorites)
 {
     std::cout << BOLD << ITALIC << BLUE << "PLAYLISTS" << RESET << std::endl;
 
     for(int i = 0; i < playlists.size(); i++)
     {
-        std::cout << RED << i << ". " << playlists[i]->getName() << RESET << std::endl;
+        std::cout << YELLOW << i << ". " << playlists[i]->getName() << RESET << std::endl;
         std::vector<Song*> this_playlist_songs = playlists[i]->getSongs();
         for(int j = 0; j < this_playlist_songs.size(); j++)
         {
-            std::cout << GREEN << "    " << j << ". " << this_playlist_songs[j]->getTitle() << RESET << std::endl;
+            std::cout << GREEN << "    " << j << ". " << this_playlist_songs[j]->getTitle() << RESET;
+            if (std::find(favorites.begin(), favorites.end(), this_playlist_songs[j]) != favorites.end())
+                std::cout << RED << " ♥ " << RESET;
+            std::cout << std::endl;
         }
     }
 }
@@ -126,5 +132,18 @@ void UIRender::printCurrentPlaybackMode(PlaybackMode current_playback_mode)
     }
 
     std::cout << std::endl << RESET;
+}
+
+void UIRender::printSortOptions()
+{
+    std::cout << YELLOW
+              << "1. Sort by title" << std::endl
+              << "2. Sort by artist" << std::endl
+              << "3. Sort by album" << std::endl
+              << "4. Sort by genre" << std::endl
+              << "5. Sort by year" << std::endl
+              << "6. Sort by duration" << std::endl
+              << "0. Exit" << std::endl
+              << RESET;
 }
 

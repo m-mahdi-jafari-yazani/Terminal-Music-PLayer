@@ -95,3 +95,19 @@ int InputHandler::takePlaybackMode()
     return which_playback_mode;
 }
 
+int InputHandler::takeANewFavorte()
+{
+    int which_song;
+    std::cout << "Which song do you want to add to your favorites? ";
+    std::cin >> which_song;
+    return which_song;
+}
+
+int InputHandler::takeSortOption()
+{
+    int which_option;
+    std::cout << "Sort whith which item? ";
+    std::cin >> which_option;
+    return which_option;
+}
+

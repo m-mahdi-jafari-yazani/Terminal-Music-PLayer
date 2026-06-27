@@ -21,4 +21,8 @@ public:
     int search();
 
     int takePlaybackMode();
+
+    int takeANewFavorte();
+
+    int takeSortOption();
 };

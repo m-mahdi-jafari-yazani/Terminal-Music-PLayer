@@ -17,9 +17,9 @@ public:
     void printSong(Song* song);
     void printSongs(std::vector<Song*> songs);
     void printPlayingSongOptions();
-    void printPlaylists(std::vector<Playlist*> playlists);
+    void printPlaylists(std::vector<Playlist*> playlists, std::vector<Song*> favorites);
     void printSearchItems();
-
     void printPlaybackModes();
     void printCurrentPlaybackMode(PlaybackMode current_playback_mode);
+    void printSortOptions();
 };

@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "Song.h"
 #include "Playlist.h"
 #include "MusicLibrary.h"
 #include "M3uLoader.h"
@@ -17,6 +18,7 @@ private:
     MusicLibrary* library;
     std::vector<Playlist*> playlists;
     Player play_engine;
+    std::vector<Song*> favorites;
 
     InputHandler* input_handler = new InputHandler();
     UIRender* user_interface = new UIRender();
@@ -24,8 +26,7 @@ private:
     int current_playlist_index;
     int current_song_index;
 
-public:
-    Application();
+    bool isValid(int current_playlist_index, int current_song_index);
 
     void playAMusic();
 
@@ -43,6 +44,12 @@ public:
 
     void setPlaybackMode();
 
+    void addASongToFavorites();
+
+    void TemporarySortLibrary();
+
+public:
+    Application();
     void run();
 };
 

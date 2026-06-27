@@ -5,6 +5,9 @@
 
 #include "Song.h"
 
+
+
+
 Application::Application()
 {
     library = playlists_loader.getLibrary();
@@ -12,18 +15,32 @@ Application::Application()
     play_engine.setPlaylists(playlists);
 }
 
+bool Application::isValid(int current_playlist_index, int current_song_index)
+{
+    if(current_playlist_index < 0 || playlists.size() <= current_playlist_index)
+        return false;
+    
+    if(current_song_index < 0 || playlists[current_playlist_index]->getSongs().size() <= current_playlist_index)
+        return false;
+
+    return true;
+}
+
 void Application::playAMusic()
 {
     user_interface->clear();
-    user_interface->printPlaylists(playlists);
+    user_interface->printPlaylists(playlists, favorites);
     input_handler->selectSong(current_playlist_index, current_song_index); // pass by reference
+
+    if(!isValid(current_playlist_index, current_song_index))
+        throw std::out_of_range("Invalid index");
 
     int command;
 
     while(true)
     {
         user_interface->clear();
-        user_interface->printPlaylists(playlists);
+        user_interface->printPlaylists(playlists, favorites);
         user_interface->printSong(playlists[current_playlist_index]->getSongs()[current_song_index]);
         user_interface->printCurrentPlaybackMode(play_engine.getCurrentMode());
         user_interface->printPlayingSongOptions();
@@ -172,29 +189,33 @@ void Application::search()
         {
             search_by_title();
         }
-        if(search_by == 2)
+        else if(search_by == 2)
         {
             search_by_artist();
         }
-        if(search_by == 3)
+        else if(search_by == 3)
         {
             search_by_album();
         }
-        if(search_by == 4)
+        else if(search_by == 4)
         {
             search_by_genre();
         }
-        if(search_by == 5)
+        else if(search_by == 5)
         {
             search_by_year();
         }
-        if(search_by == 6)
+        else if(search_by == 6)
         {
             search_by_duration();
         }
-        if(search_by == 0)
+        else if(search_by == 0)
         {
             break;
+        }
+        else 
+        {
+            user_interface->clear();
         }
     }
 
@@ -232,6 +253,65 @@ void Application::setPlaybackMode()
     user_interface->clear();
 }
 
+void Application::addASongToFavorites()
+{
+    user_interface->clear();
+    user_interface->printSongs(library->getAllSongs()); 
+    int which_song = input_handler->takeANewFavorte();
+
+    if(which_song < 0 || library->getAllSongs().size() <= which_song)
+    {
+        user_interface->clear();
+        addASongToFavorites();
+        return;
+    }
+
+    favorites.push_back(library->getAllSongs()[which_song]);
+    user_interface->clear();
+}
+
+void Application::TemporarySortLibrary()
+{
+    user_interface->clear();
+
+    while(true)
+    {
+        user_interface->printSortOptions();
+        int which_option = input_handler->takeSortOption();
+
+        if (which_option == 0)
+            break;
+
+        else if(which_option < 0 || 6 < which_option)
+        {
+            user_interface->clear();
+            TemporarySortLibrary();
+            return;
+        }
+
+        std::vector<Song*> copy_library = library->getAllSongs();
+
+
+        std::sort(copy_library.begin(), copy_library.end(),
+            [which_option](Song* a, Song* b)
+            {
+                switch (which_option)
+                {
+                    case 1:     return a->getTitle() < b->getTitle();
+                    case 2:     return a->getArtist() < b->getArtist();
+                    case 3:     return a->getAlbum() < b->getAlbum();
+                    case 4:     return a->getGenre() < b->getGenre();
+                    case 5:     return a->getYear() < b->getYear();
+                    case 6:     return a->getDuration() < b->getDuration();
+                    default:    return false;
+                }
+            });
+
+        user_interface->printSongs(copy_library);
+    }
+    user_interface->clear();
+}
+
 void Application::run()
 {   
     user_interface->clear(); 
@@ -244,14 +324,31 @@ void Application::run()
         user_interface->printMainMenu();
         command = input_handler->selectMainMenuOption();
 
+        label:
         if(command == 1)
-            playAMusic();
+        {
+            try
+            {
+                playAMusic();
+            }
+            catch(std::out_of_range& e)
+            {
+                user_interface->clear();
+                goto label;
+            }
+        }
         
-        if(command == 2)
+        else if(command == 2)
             search();
 
-        if(command == 3)
+        else if(command == 3)
             setPlaybackMode();
+        
+        else if(command == 4)
+            addASongToFavorites();
+        
+        else if(command == 5)
+            TemporarySortLibrary();
 
         else if(command == 0)
             return;
